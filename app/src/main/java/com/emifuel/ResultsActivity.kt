@@ -52,9 +52,9 @@ class ResultsActivity : ComponentActivity() {
         val success = pdfGenerator.generatePdf(result)
 
         if (success) {
-            Toast.makeText(this, "PDF CA?VH=> 715@565=> 2 ?0?FV Downloads", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "PDF успішно збережено в папці Downloads", Toast.LENGTH_LONG).show()
         } else {
-            Toast.makeText(this, "><8;:0 ?@8 715@565==V PDF", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Помилка при збереженні PDF", Toast.LENGTH_SHORT).show()
         }
     }
 }

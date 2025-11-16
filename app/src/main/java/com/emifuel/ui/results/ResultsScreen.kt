@@ -24,10 +24,10 @@ fun ResultsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(" 57C;LB0B8 @>7@0EC=:C") },
+                title = { Text("Результати розрахунку") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "0704")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -45,7 +45,7 @@ fun ResultsScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // 0@B:0 22545=8E 40=8E
+            // Картка введених даних
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -57,23 +57,23 @@ fun ResultsScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "2545=V 40=V",
+                        text = "Введені дані",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                     HorizontalDivider()
 
-                    DataRow(""5E=>;>3VO A?0;N20==O:", result.inputData.combustionTechnology)
-                    DataRow(""5E=>;>3VO 45AC;LDC@870FVW:", result.inputData.desulfurizationTechnology)
-                    DataRow(""8? ?0;820:", result.inputData.fuelType.displayName)
+                    DataRow("Технологія спалювання:", result.inputData.combustionTechnology)
+                    DataRow("Технологія десульфуризації:", result.inputData.desulfurizationTechnology)
+                    DataRow("Тип палива:", result.inputData.fuelType.displayName)
                     DataRow(
-                        "8B@0B0 ?0;820:",
+                        "Витрата палива:",
                         "${decimalFormat.format(result.inputData.fuelConsumption)} ${result.inputData.fuelType.unit}"
                     )
                 }
             }
 
-            // 0@B:0 @57C;LB0BV2
+            // Картка результатів
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -85,31 +85,31 @@ fun ResultsScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = " 57C;LB0B8",
+                        text = "Результати",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     HorizontalDivider()
 
                     ResultRow(
-                        ">:07=8: 5<VAVW:",
-                        "${decimalFormat.format(result.emissionFactor)} 3/6"
+                        "Показник емісії:",
+                        "${decimalFormat.format(result.emissionFactor)} г/ГДж"
                     )
                     ResultRow(
-                        "0;>289 28:84:",
-                        "${decimalFormat.format(result.totalEmission)} B"
+                        "Валовий викид:",
+                        "${decimalFormat.format(result.totalEmission)} т"
                     )
                 }
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // =>?:0 715@565==O
+            // Кнопка збереження
             Button(
                 onClick = onSavePdf,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("15@53B8 2 PDF")
+                Text("Зберегти в PDF")
             }
         }
     }

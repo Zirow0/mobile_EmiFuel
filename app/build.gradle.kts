@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.emifuel"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.emifuel"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -37,6 +37,9 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    lint {
+        disable += "PropertyEscape"
     }
 }
 

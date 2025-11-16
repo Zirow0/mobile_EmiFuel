@@ -22,7 +22,7 @@ fun MainScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("EmiFuel - 0;L:C;OB>@ 28:84V2") },
+                title = { Text("EmiFuel - Калькулятор викидів") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -39,39 +39,39 @@ fun MainScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "254VBL ?0@0<5B@8 4;O @>7@0EC=:C",
+                text = "Введіть параметри для розрахунку",
                 style = MaterialTheme.typography.titleMedium
             )
 
-            // "5E=>;>3VO A?0;N20==O
+            // Технологія спалювання
             DropdownField(
-                label = ""5E=>;>3VO A?0;N20==O",
+                label = "Технологія спалювання",
                 options = viewModel.combustionTechnologies,
                 selectedOption = uiState.combustionTechnology,
                 onOptionSelected = viewModel::onCombustionTechnologyChanged
             )
 
-            // "5E=>;>3VO 45AC;LDC@870FVW
+            // Технологія десульфуризації
             DropdownField(
-                label = ""5E=>;>3VO 45AC;LDC@870FVW",
+                label = "Технологія десульфуризації",
                 options = viewModel.desulfurizationTechnologies,
                 selectedOption = uiState.desulfurizationTechnology,
                 onOptionSelected = viewModel::onDesulfurizationTechnologyChanged
             )
 
-            // "8? ?0;820
+            // Тип палива
             FuelTypeDropdown(
                 fuelTypes = viewModel.fuelTypes,
                 selectedFuelType = uiState.fuelType,
                 onFuelTypeSelected = viewModel::onFuelTypeChanged
             )
 
-            // 8B@0B0 ?0;820
+            // Витрата палива
             OutlinedTextField(
                 value = uiState.fuelConsumption,
                 onValueChange = viewModel::onFuelConsumptionChanged,
                 label = {
-                    Text("8B@0B0 ?0;820 (${uiState.fuelType?.unit ?: ">48=8FL"})")
+                    Text("Витрата палива (${uiState.fuelType?.unit ?: "одиниць"})")
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(),
@@ -80,7 +80,7 @@ fun MainScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // =>?:8
+            // Кнопки
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -89,7 +89,7 @@ fun MainScreen(
                     onClick = viewModel::clearAll,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("G8AB8B8")
+                    Text("Очистити")
                 }
 
                 Button(
@@ -97,7 +97,7 @@ fun MainScreen(
                     enabled = uiState.isCalculateEnabled,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text(" >7@0EC20B8")
+                    Text("Розрахувати")
                 }
             }
         }
@@ -163,7 +163,7 @@ fun FuelTypeDropdown(
             value = selectedFuelType?.displayName ?: "",
             onValueChange = {},
             readOnly = true,
-            label = { Text(""8? ?0;820") },
+            label = { Text("Тип палива") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()

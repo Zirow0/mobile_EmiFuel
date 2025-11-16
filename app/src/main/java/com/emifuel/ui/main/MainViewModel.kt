@@ -23,8 +23,8 @@ class MainViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
-    val combustionTechnologies = listOf("8;>C3>;L=>5", "&8:;>==5")
-    val desulfurizationTechnologies = listOf("57 45AC;LDC@870FVW", "!CE0 45AC;LDC@870FVO", ">:@0 45AC;LDC@870FVO")
+    val combustionTechnologies = listOf("Пиловугільне", "Циклонне")
+    val desulfurizationTechnologies = listOf("Без десульфуризації", "Суха десульфуризація", "Мокра десульфуризація")
     val fuelTypes = FuelType.values().toList()
 
     fun onCombustionTechnologyChanged(value: String) {
