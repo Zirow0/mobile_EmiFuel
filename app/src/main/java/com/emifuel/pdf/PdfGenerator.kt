@@ -44,10 +44,10 @@ class PdfGenerator(private val context: Context) {
                 .useAllAvailableWidth()
 
             inputTable.addCell("Tekhnolohiia spaluvannia")
-            inputTable.addCell(result.inputData.combustionTechnology)
+            inputTable.addCell(result.inputData.combustionTechnology.displayName)
 
             inputTable.addCell("Tekhnolohiia desulfuryzatsii")
-            inputTable.addCell(result.inputData.desulfurizationTechnology)
+            inputTable.addCell(result.inputData.desulfurizationTechnology.displayName)
 
             inputTable.addCell("Typ palyva")
             inputTable.addCell(result.inputData.fuelType.displayName)

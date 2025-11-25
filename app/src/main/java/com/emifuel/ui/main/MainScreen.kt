@@ -9,6 +9,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.emifuel.model.CombustionTechnology
+import com.emifuel.model.DesulfurizationTechnology
 import com.emifuel.model.FuelType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,24 +41,22 @@ fun MainScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Введіть параметри для розрахунку",
+                text = "Основні параметри",
                 style = MaterialTheme.typography.titleMedium
             )
 
             // Технологія спалювання
-            DropdownField(
-                label = "Технологія спалювання",
-                options = viewModel.combustionTechnologies,
-                selectedOption = uiState.combustionTechnology,
-                onOptionSelected = viewModel::onCombustionTechnologyChanged
+            CombustionTechnologyDropdown(
+                technologies = viewModel.combustionTechnologies,
+                selectedTechnology = uiState.combustionTechnology,
+                onTechnologySelected = viewModel::onCombustionTechnologyChanged
             )
 
             // Технологія десульфуризації
-            DropdownField(
-                label = "Технологія десульфуризації",
-                options = viewModel.desulfurizationTechnologies,
-                selectedOption = uiState.desulfurizationTechnology,
-                onOptionSelected = viewModel::onDesulfurizationTechnologyChanged
+            DesulfurizationTechnologyDropdown(
+                technologies = viewModel.desulfurizationTechnologies,
+                selectedTechnology = uiState.desulfurizationTechnology,
+                onTechnologySelected = viewModel::onDesulfurizationTechnologyChanged
             )
 
             // Тип палива
@@ -71,14 +71,27 @@ fun MainScreen(
                 value = uiState.fuelConsumption,
                 onValueChange = viewModel::onFuelConsumptionChanged,
                 label = {
-                    Text("Витрата палива (${uiState.fuelType?.unit ?: "одиниць"})")
+                    Text("Витрата палива B (${uiState.fuelType?.unit ?: "одиниць"})")
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            // Ефективність золоуловлювання (тільки для вугілля та мазуту)
+            if (uiState.fuelType != null && uiState.fuelType != FuelType.GAS) {
+                OutlinedTextField(
+                    value = uiState.dustCollectionEfficiency,
+                    onValueChange = viewModel::onDustCollectionEfficiencyChanged,
+                    label = { Text("Ефективність золоуловлювання ηзу (0-1)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    supportingText = { Text("Наприклад: 0.985 для ЕГА") }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Кнопки
             Row(
@@ -106,11 +119,10 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownField(
-    label: String,
-    options: List<String>,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit
+fun CombustionTechnologyDropdown(
+    technologies: List<CombustionTechnology>,
+    selectedTechnology: CombustionTechnology?,
+    onTechnologySelected: (CombustionTechnology) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -119,10 +131,10 @@ fun DropdownField(
         onExpandedChange = { expanded = it }
     ) {
         OutlinedTextField(
-            value = selectedOption,
+            value = selectedTechnology?.displayName ?: "",
             onValueChange = {},
             readOnly = true,
-            label = { Text(label) },
+            label = { Text("Технологія спалювання") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
@@ -133,11 +145,52 @@ fun DropdownField(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            options.forEach { option ->
+            technologies.forEach { tech ->
                 DropdownMenuItem(
-                    text = { Text(option) },
+                    text = { Text(tech.displayName) },
                     onClick = {
-                        onOptionSelected(option)
+                        onTechnologySelected(tech)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DesulfurizationTechnologyDropdown(
+    technologies: List<DesulfurizationTechnology>,
+    selectedTechnology: DesulfurizationTechnology?,
+    onTechnologySelected: (DesulfurizationTechnology) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        OutlinedTextField(
+            value = selectedTechnology?.displayName ?: "",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Технологія десульфуризації") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor()
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            technologies.forEach { tech ->
+                DropdownMenuItem(
+                    text = { Text(tech.displayName) },
+                    onClick = {
+                        onTechnologySelected(tech)
                         expanded = false
                     }
                 )

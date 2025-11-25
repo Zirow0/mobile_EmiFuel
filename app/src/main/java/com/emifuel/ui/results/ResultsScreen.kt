@@ -63,13 +63,29 @@ fun ResultsScreen(
                     )
                     HorizontalDivider()
 
-                    DataRow("Технологія спалювання:", result.inputData.combustionTechnology)
-                    DataRow("Технологія десульфуризації:", result.inputData.desulfurizationTechnology)
+                    DataRow("Технологія спалювання:", result.inputData.combustionTechnology.displayName)
+                    DataRow("Технологія десульфуризації:", result.inputData.desulfurizationTechnology.displayName)
                     DataRow("Тип палива:", result.inputData.fuelType.displayName)
                     DataRow(
-                        "Витрата палива:",
+                        "Витрата палива B:",
                         "${decimalFormat.format(result.inputData.fuelConsumption)} ${result.inputData.fuelType.unit}"
                     )
+
+                    if (result.inputData.ashContent > 0) {
+                        DataRow("Масовий вміст золи Ar:", "${decimalFormat.format(result.inputData.ashContent)} %")
+                    }
+                    if (result.inputData.lowerHeatingValue > 0) {
+                        DataRow("Нижча теплота згоряння Qr:", "${decimalFormat.format(result.inputData.lowerHeatingValue)} МДж/кг")
+                    }
+                    if (result.inputData.combustiblesInAsh > 0) {
+                        DataRow("Вміст горючих Гвин:", "${decimalFormat.format(result.inputData.combustiblesInAsh)} %")
+                    }
+                    if (result.ashCarryoverValue > 0) {
+                        DataRow("Частка леткої золи aвин:", decimalFormat.format(result.ashCarryoverValue))
+                    }
+                    if (result.dustRemovalEfficiency > 0) {
+                        DataRow("Ефективність очищення ηзу:", decimalFormat.format(result.dustRemovalEfficiency))
+                    }
                 }
             }
 
@@ -91,18 +107,73 @@ fun ResultsScreen(
                     )
                     HorizontalDivider()
 
+                    if (result.emissionFactorBeforeClearing > 0) {
+                        ResultRow(
+                            "Показник емісії (до очищення):",
+                            "${decimalFormat.format(result.emissionFactorBeforeClearing)} г/ГДж"
+                        )
+                    }
+
                     ResultRow(
-                        "Показник емісії:",
+                        "Показник емісії kтв (після очищення):",
                         "${decimalFormat.format(result.emissionFactor)} г/ГДж"
                     )
                     ResultRow(
-                        "Валовий викид:",
+                        "Валовий викид E:",
                         "${decimalFormat.format(result.totalEmission)} т"
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            // Деталі розрахунку формули (2.2)
+            if (result.formula22Details.isNotEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Деталі розрахунку",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                        HorizontalDivider()
+                        Text(
+                            text = result.formula22Details,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+
+            // Деталі розрахунку формули (2.1)
+            if (result.formula21Details.isNotEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = result.formula21Details,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Кнопка збереження
             Button(

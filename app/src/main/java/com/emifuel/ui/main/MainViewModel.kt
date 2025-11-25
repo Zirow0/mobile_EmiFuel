@@ -2,6 +2,9 @@ package com.emifuel.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.emifuel.model.CombustionTechnology
+import com.emifuel.model.DesulfurizationTechnology
+import com.emifuel.model.FuelData
 import com.emifuel.model.FuelType
 import com.emifuel.model.InputData
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,10 +14,20 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class MainUiState(
-    val combustionTechnology: String = "",
-    val desulfurizationTechnology: String = "",
+    val combustionTechnology: CombustionTechnology? = null,
+    val desulfurizationTechnology: DesulfurizationTechnology? = null,
     val fuelType: FuelType? = null,
     val fuelConsumption: String = "",
+
+    // Нові поля з завдання
+    val ashContent: String = "", // Ar - масовий вміст золи, %
+    val lowerHeatingValue: String = "", // Qr - нижча теплота згоряння, МДж/кг
+    val combustiblesInAsh: String = "", // Гвин - вміст горючих у викидах, %
+    val sulfurContent: String = "", // Sr - масовий вміст сірки, %
+    val ashCarryoverFraction: String = "", // aвин - частка золи, що виноситься, 0-1
+    val dustCollectionEfficiency: String = "", // ηзу - ефективність золоуловлювання, 0-1
+    val mechanicalIncompleteCombustion: String = "", // q4 - втрати від недопалу, %
+
     val isCalculateEnabled: Boolean = false
 )
 
@@ -23,24 +36,62 @@ class MainViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
-    val combustionTechnologies = listOf("Пиловугільне", "Циклонне")
-    val desulfurizationTechnologies = listOf("Без десульфуризації", "Суха десульфуризація", "Мокра десульфуризація")
+    val combustionTechnologies = CombustionTechnology.values().toList()
+    val desulfurizationTechnologies = DesulfurizationTechnology.values().toList()
     val fuelTypes = FuelType.values().toList()
 
-    fun onCombustionTechnologyChanged(value: String) {
+    fun onCombustionTechnologyChanged(value: CombustionTechnology) {
         updateState { copy(combustionTechnology = value) }
     }
 
-    fun onDesulfurizationTechnologyChanged(value: String) {
+    fun onDesulfurizationTechnologyChanged(value: DesulfurizationTechnology) {
         updateState { copy(desulfurizationTechnology = value) }
     }
 
     fun onFuelTypeChanged(value: FuelType) {
-        updateState { copy(fuelType = value) }
+        // Автоматично підставляємо значення з таблиць А.1-А.4
+        val characteristics = FuelData.getCharacteristics(value)
+        updateState {
+            copy(
+                fuelType = value,
+                ashContent = if (value == FuelType.GAS) "" else characteristics.ashContent.toString(),
+                lowerHeatingValue = characteristics.lowerHeatingValue.toString(),
+                combustiblesInAsh = if (value == FuelType.GAS) "" else characteristics.combustiblesInAsh.toString(),
+                sulfurContent = if (value == FuelType.GAS) "" else characteristics.sulfurContent.toString()
+            )
+        }
     }
 
     fun onFuelConsumptionChanged(value: String) {
         updateState { copy(fuelConsumption = value) }
+    }
+
+    fun onAshContentChanged(value: String) {
+        updateState { copy(ashContent = value) }
+    }
+
+    fun onLowerHeatingValueChanged(value: String) {
+        updateState { copy(lowerHeatingValue = value) }
+    }
+
+    fun onCombustiblesInAshChanged(value: String) {
+        updateState { copy(combustiblesInAsh = value) }
+    }
+
+    fun onSulfurContentChanged(value: String) {
+        updateState { copy(sulfurContent = value) }
+    }
+
+    fun onAshCarryoverFractionChanged(value: String) {
+        updateState { copy(ashCarryoverFraction = value) }
+    }
+
+    fun onDustCollectionEfficiencyChanged(value: String) {
+        updateState { copy(dustCollectionEfficiency = value) }
+    }
+
+    fun onMechanicalIncompleteCombustionChanged(value: String) {
+        updateState { copy(mechanicalIncompleteCombustion = value) }
     }
 
     fun clearAll() {
@@ -51,10 +102,17 @@ class MainViewModel : ViewModel() {
         val state = _uiState.value
         return if (state.isCalculateEnabled) {
             InputData(
-                combustionTechnology = state.combustionTechnology,
-                desulfurizationTechnology = state.desulfurizationTechnology,
+                combustionTechnology = state.combustionTechnology!!,
+                desulfurizationTechnology = state.desulfurizationTechnology!!,
                 fuelType = state.fuelType!!,
-                fuelConsumption = state.fuelConsumption.toDoubleOrNull() ?: 0.0
+                fuelConsumption = state.fuelConsumption.toDoubleOrNull() ?: 0.0,
+                ashContent = state.ashContent.toDoubleOrNull() ?: 0.0,
+                lowerHeatingValue = state.lowerHeatingValue.toDoubleOrNull() ?: 0.0,
+                combustiblesInAsh = state.combustiblesInAsh.toDoubleOrNull() ?: 0.0,
+                sulfurContent = state.sulfurContent.toDoubleOrNull() ?: 0.0,
+                ashCarryoverFraction = state.ashCarryoverFraction.toDoubleOrNull() ?: 0.0,
+                dustCollectionEfficiency = state.dustCollectionEfficiency.toDoubleOrNull() ?: 0.0,
+                mechanicalIncompleteCombustion = state.mechanicalIncompleteCombustion.toDoubleOrNull() ?: 0.0
             )
         } else null
     }
@@ -69,9 +127,22 @@ class MainViewModel : ViewModel() {
     }
 
     private fun validateInput(state: MainUiState): Boolean {
-        return state.combustionTechnology.isNotEmpty() &&
-                state.desulfurizationTechnology.isNotEmpty() &&
+        // Базові поля
+        val basicValid = state.combustionTechnology != null &&
+                state.desulfurizationTechnology != null &&
                 state.fuelType != null &&
                 state.fuelConsumption.toDoubleOrNull()?.let { it > 0 } == true
+
+        // Для природного газу не потрібні параметри золи
+        if (state.fuelType == FuelType.GAS) {
+            return basicValid
+        }
+
+        // Для вугілля та мазуту потрібні додаткові параметри
+        return basicValid &&
+                state.ashContent.toDoubleOrNull()?.let { it >= 0 } == true &&
+                state.lowerHeatingValue.toDoubleOrNull()?.let { it > 0 } == true &&
+                state.combustiblesInAsh.toDoubleOrNull()?.let { it >= 0 } == true &&
+                state.dustCollectionEfficiency.toDoubleOrNull()?.let { it >= 0 && it <= 1 } == true
     }
 }
