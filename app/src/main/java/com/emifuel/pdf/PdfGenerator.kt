@@ -38,7 +38,7 @@ class PdfGenerator(private val context: Context) {
             document.add(Paragraph("Data: ${SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(Date())}"))
             document.add(Paragraph("\n"))
 
-            // "01;8FO 2EV4=8E 40=8E
+            // Вхідні дані
             document.add(Paragraph("Vkhidni dani").setFontSize(14f).setBold())
             val inputTable = Table(UnitValue.createPercentArray(floatArrayOf(50f, 50f)))
                 .useAllAvailableWidth()
@@ -52,24 +52,74 @@ class PdfGenerator(private val context: Context) {
             inputTable.addCell("Typ palyva")
             inputTable.addCell(result.inputData.fuelType.displayName)
 
-            inputTable.addCell("Vytrata palyva")
+            inputTable.addCell("Vytrata palyva B")
             inputTable.addCell("${decimalFormat.format(result.inputData.fuelConsumption)} ${result.inputData.fuelType.unit}")
+
+            // Додаткові параметри палива (якщо не газ)
+            if (result.inputData.ashContent > 0) {
+                inputTable.addCell("Masovyi vmist zoly Ar")
+                inputTable.addCell("${decimalFormat.format(result.inputData.ashContent)} %")
+            }
+
+            if (result.inputData.lowerHeatingValue > 0) {
+                inputTable.addCell("Nyzhcha teplota zhoriannia Qr")
+                inputTable.addCell("${decimalFormat.format(result.inputData.lowerHeatingValue)} MDzh/kg")
+            }
+
+            if (result.inputData.combustiblesInAsh > 0) {
+                inputTable.addCell("Vmist horiuchykh Hvyn")
+                inputTable.addCell("${decimalFormat.format(result.inputData.combustiblesInAsh)} %")
+            }
+
+            if (result.inputData.sulfurContent > 0) {
+                inputTable.addCell("Masovyi vmist sirky Sr")
+                inputTable.addCell("${decimalFormat.format(result.inputData.sulfurContent)} %")
+            }
+
+            if (result.ashCarryoverValue > 0) {
+                inputTable.addCell("Chastka letkoi zoly avyn")
+                inputTable.addCell(decimalFormat.format(result.ashCarryoverValue))
+            }
+
+            if (result.dustRemovalEfficiency > 0) {
+                inputTable.addCell("Efektyvnist ochyshchennia etazu")
+                inputTable.addCell(decimalFormat.format(result.dustRemovalEfficiency))
+            }
 
             document.add(inputTable)
             document.add(Paragraph("\n"))
 
-            // "01;8FO @57C;LB0BV2
+            // Результати
             document.add(Paragraph("Rezultaty rozrakhunku").setFontSize(14f).setBold())
             val resultsTable = Table(UnitValue.createPercentArray(floatArrayOf(50f, 50f)))
                 .useAllAvailableWidth()
 
-            resultsTable.addCell("Pokaznyk emisii")
+            if (result.emissionFactorBeforeClearing > 0) {
+                resultsTable.addCell("Pokaznyk emisii (do ochyshchennia)")
+                resultsTable.addCell("${decimalFormat.format(result.emissionFactorBeforeClearing)} g/GDzh")
+            }
+
+            resultsTable.addCell("Pokaznyk emisii ktv (pislia ochyshchennia)")
             resultsTable.addCell("${decimalFormat.format(result.emissionFactor)} g/GDzh")
 
-            resultsTable.addCell("Valovyi vykyd")
+            resultsTable.addCell("Valovyi vykyd E")
             resultsTable.addCell("${decimalFormat.format(result.totalEmission)} t")
 
             document.add(resultsTable)
+            document.add(Paragraph("\n"))
+
+            // Деталі розрахунку формули (2.2)
+            if (result.formula22Details.isNotEmpty()) {
+                document.add(Paragraph("Detali rozrakhunku formuly (2.2)").setFontSize(12f).setBold())
+                document.add(Paragraph(result.formula22Details).setFontSize(10f))
+                document.add(Paragraph("\n"))
+            }
+
+            // Деталі розрахунку формули (2.1)
+            if (result.formula21Details.isNotEmpty()) {
+                document.add(Paragraph("Detali rozrakhunku formuly (2.1)").setFontSize(12f).setBold())
+                document.add(Paragraph(result.formula21Details).setFontSize(10f))
+            }
 
             document.close()
             true
