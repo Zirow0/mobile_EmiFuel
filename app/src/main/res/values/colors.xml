@@ -9,7 +9,7 @@
     <color name="accent">#FFC107</color>
     <color name="accent_dark">#FFA000</color>
 
-    <!-- Background colors -->
+    <!-- Background & Surface -->
     <color name="background">#FFFFFF</color>
     <color name="surface">#FFFFFF</color>
 
@@ -18,11 +18,13 @@
     <color name="text_secondary">#757575</color>
     <color name="text_hint">#BDBDBD</color>
 
-    <!-- Error color -->
+    <!-- Status colors -->
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FFC107</color>
     <color name="error">#F44336</color>
 
-    <!-- Other colors -->
+    <!-- Utility -->
+    <color name="divider">#E0E0E0</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="divider">#E0E0E0</color>
 </resources>

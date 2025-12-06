@@ -2,36 +2,47 @@ package com.emifuel.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Primary colors - Blue
-val Primary = Color(0xFF1976D2)
-val PrimaryDark = Color(0xFF1565C0)
-val PrimaryLight = Color(0xFFBBDEFB)
+// Primary Colors
+val Primary = Color(0xFF1976D2)         //0x1976D2
+val PrimaryDark = Color(0xFF1565C0)     //0x1565C0
+val PrimaryLight = Color(0xFFBBDEFB)    //0xBBDEFB
 
-// Secondary colors - Amber/Yellow
-val Secondary = Color(0xFFFFC107)
-val SecondaryDark = Color(0xFFFFA000)
+// Accent Colors
+val Accent = Color(0xFFFFC107)          //0xFFC107
+val AccentDark = Color(0xFFFFA000)      //0xFFA000
 
-// Background colors
-val Background = Color(0xFFFFFFFF)
-val Surface = Color(0xFFFFFFFF)
+// Background & Surface
+val Background = Color(0xFFFFFFFF)      //0xFFFFFF
+val Surface = Color(0xFFFFFFFF)         //0xFFFFFF
 
-// Text colors
-val TextPrimary = Color(0xFF212121)
-val TextSecondary = Color(0xFF757575)
+// Text Colors
+val TextPrimary = Color(0xFF212121)     //0x212121
+val TextSecondary = Color(0xFF757575)   //0x757575
+val TextHint = Color(0xFFBDBDBD)        //0xBDBDBD
 
-// Error color
-val Error = Color(0xFFF44336)
+// Status Colors
+val Success = Color(0xFF4CAF50)         //0x4CAF50
+val Warning = Color(0xFFFFC107)         //0xFFC107
+val Error = Color(0xFFF44336)           //0xF44336
 
-// Light theme
+// Utility
+val Divider = Color(0xFFE0E0E0)         //0xE0E0E0
+
+// Light theme colors for Material 3
 val md_theme_light_primary = Primary
 val md_theme_light_onPrimary = Color(0xFFFFFFFF)
 val md_theme_light_primaryContainer = PrimaryLight
 val md_theme_light_onPrimaryContainer = PrimaryDark
 
-val md_theme_light_secondary = Secondary
+val md_theme_light_secondary = Accent
 val md_theme_light_onSecondary = Color(0xFF000000)
 val md_theme_light_secondaryContainer = Color(0xFFFFECB3)
-val md_theme_light_onSecondaryContainer = SecondaryDark
+val md_theme_light_onSecondaryContainer = AccentDark
+
+val md_theme_light_tertiary = Success
+val md_theme_light_onTertiary = Color(0xFFFFFFFF)
+val md_theme_light_tertiaryContainer = Color(0xFFC8E6C9)
+val md_theme_light_onTertiaryContainer = Color(0xFF2E7D32)
 
 val md_theme_light_background = Background
 val md_theme_light_onBackground = TextPrimary
@@ -40,22 +51,10 @@ val md_theme_light_onSurface = TextPrimary
 
 val md_theme_light_error = Error
 val md_theme_light_onError = Color(0xFFFFFFFF)
+val md_theme_light_errorContainer = Color(0xFFFFCDD2)
+val md_theme_light_onErrorContainer = Color(0xFFC62828)
 
-// Dark theme
-val md_theme_dark_primary = PrimaryLight
-val md_theme_dark_onPrimary = PrimaryDark
-val md_theme_dark_primaryContainer = PrimaryDark
-val md_theme_dark_onPrimaryContainer = PrimaryLight
-
-val md_theme_dark_secondary = Color(0xFFFFD54F)
-val md_theme_dark_onSecondary = Color(0xFF000000)
-val md_theme_dark_secondaryContainer = SecondaryDark
-val md_theme_dark_onSecondaryContainer = Color(0xFFFFECB3)
-
-val md_theme_dark_background = Color(0xFF121212)
-val md_theme_dark_onBackground = Color(0xFFE0E0E0)
-val md_theme_dark_surface = Color(0xFF1E1E1E)
-val md_theme_dark_onSurface = Color(0xFFE0E0E0)
-
-val md_theme_dark_error = Color(0xFFCF6679)
-val md_theme_dark_onError = Color(0xFF000000)
+val md_theme_light_outline = Divider
+val md_theme_light_outlineVariant = Color(0xFFF5F5F5)
+val md_theme_light_surfaceVariant = Color(0xFFEAEAEA)       //0xCEAEAEA
+val md_theme_light_onSurfaceVariant = TextSecondary

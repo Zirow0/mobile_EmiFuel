@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.emifuel.model.CombustionTechnology
 import com.emifuel.model.DesulfurizationTechnology
+import com.emifuel.model.DustFilterType
 import com.emifuel.model.FuelData
 import com.emifuel.model.FuelType
 import com.emifuel.model.InputData
@@ -25,6 +26,7 @@ data class MainUiState(
     val combustiblesInAsh: String = "", // Гвин - вміст горючих у викидах, %
     val sulfurContent: String = "", // Sr - масовий вміст сірки, %
     val ashCarryoverFraction: String = "", // aвин - частка золи, що виноситься, 0-1
+    val dustFilterType: DustFilterType = DustFilterType.ELECTROSTATIC, // Тип фільтра
     val dustCollectionEfficiency: String = "", // ηзу - ефективність золоуловлювання, 0-1
     val mechanicalIncompleteCombustion: String = "", // q4 - втрати від недопалу, %
 
@@ -39,6 +41,7 @@ class MainViewModel : ViewModel() {
     val combustionTechnologies = CombustionTechnology.values().toList()
     val desulfurizationTechnologies = DesulfurizationTechnology.values().toList()
     val fuelTypes = FuelType.values().toList()
+    val dustFilterTypes = DustFilterType.values().toList()
 
     fun onCombustionTechnologyChanged(value: CombustionTechnology) {
         updateState { copy(combustionTechnology = value) }
@@ -49,15 +52,35 @@ class MainViewModel : ViewModel() {
     }
 
     fun onFuelTypeChanged(value: FuelType) {
+        val state = _uiState.value
         // Автоматично підставляємо значення з таблиць А.1-А.4
         val characteristics = FuelData.getCharacteristics(value)
+
+        // Для газу встановлюємо фільтр "Немає" та ηзу = 0
+        val filterType = if (value == FuelType.GAS) DustFilterType.NONE else state.dustFilterType
+        val efficiency = if (value == FuelType.GAS) "0" else filterType.typicalEfficiency.toString()
+
         updateState {
             copy(
                 fuelType = value,
                 ashContent = if (value == FuelType.GAS) "" else characteristics.ashContent.toString(),
                 lowerHeatingValue = characteristics.lowerHeatingValue.toString(),
                 combustiblesInAsh = if (value == FuelType.GAS) "" else characteristics.combustiblesInAsh.toString(),
-                sulfurContent = if (value == FuelType.GAS) "" else characteristics.sulfurContent.toString()
+                sulfurContent = if (value == FuelType.GAS) "" else characteristics.sulfurContent.toString(),
+                dustFilterType = filterType,
+                dustCollectionEfficiency = efficiency
+            )
+        }
+    }
+
+    fun onDustFilterTypeChanged(value: DustFilterType) {
+        // Автоматично оновлюємо ηзу на типове значення для фільтра
+        val efficiency = value.typicalEfficiency.toString()
+
+        updateState {
+            copy(
+                dustFilterType = value,
+                dustCollectionEfficiency = efficiency
             )
         }
     }
@@ -111,6 +134,7 @@ class MainViewModel : ViewModel() {
                 combustiblesInAsh = state.combustiblesInAsh.toDoubleOrNull() ?: 0.0,
                 sulfurContent = state.sulfurContent.toDoubleOrNull() ?: 0.0,
                 ashCarryoverFraction = state.ashCarryoverFraction.toDoubleOrNull() ?: 0.0,
+                dustFilterType = state.dustFilterType,
                 dustCollectionEfficiency = state.dustCollectionEfficiency.toDoubleOrNull() ?: 0.0,
                 mechanicalIncompleteCombustion = state.mechanicalIncompleteCombustion.toDoubleOrNull() ?: 0.0
             )

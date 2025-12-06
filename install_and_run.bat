@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo   DocScan Lite - Install and Run
+echo   EmiFuel - Install and Run
 echo ========================================
 echo.
 

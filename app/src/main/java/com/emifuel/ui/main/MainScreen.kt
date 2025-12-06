@@ -11,6 +11,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.emifuel.model.CombustionTechnology
 import com.emifuel.model.DesulfurizationTechnology
+import com.emifuel.model.DustFilterType
 import com.emifuel.model.FuelType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,8 +27,8 @@ fun MainScreen(
             TopAppBar(
                 title = { Text("EmiFuel - Калькулятор викидів") },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         }
@@ -78,16 +79,12 @@ fun MainScreen(
                 singleLine = true
             )
 
-            // Ефективність золоуловлювання (тільки для вугілля та мазуту)
+            // Вибір типу фільтра (тільки для вугілля та мазуту)
             if (uiState.fuelType != null && uiState.fuelType != FuelType.GAS) {
-                OutlinedTextField(
-                    value = uiState.dustCollectionEfficiency,
-                    onValueChange = viewModel::onDustCollectionEfficiencyChanged,
-                    label = { Text("Ефективність золоуловлювання ηзу (0-1)") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    supportingText = { Text("Наприклад: 0.985 для ЕГА") }
+                DustFilterTypeDropdown(
+                    filterTypes = viewModel.dustFilterTypes,
+                    selectedFilterType = uiState.dustFilterType,
+                    onFilterTypeSelected = viewModel::onDustFilterTypeChanged
                 )
             }
 
@@ -138,7 +135,7 @@ fun CombustionTechnologyDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor()
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
         )
 
         ExposedDropdownMenu(
@@ -179,7 +176,7 @@ fun DesulfurizationTechnologyDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor()
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
         )
 
         ExposedDropdownMenu(
@@ -220,7 +217,7 @@ fun FuelTypeDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor()
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
         )
 
         ExposedDropdownMenu(
@@ -232,6 +229,57 @@ fun FuelTypeDropdown(
                     text = { Text(fuelType.displayName) },
                     onClick = {
                         onFuelTypeSelected(fuelType)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DustFilterTypeDropdown(
+    filterTypes: List<DustFilterType>,
+    selectedFilterType: DustFilterType,
+    onFilterTypeSelected: (DustFilterType) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        OutlinedTextField(
+            value = selectedFilterType.displayName,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Тип фільтра для очищення") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+            supportingText = { Text(selectedFilterType.description) }
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            filterTypes.forEach { filterType ->
+                DropdownMenuItem(
+                    text = {
+                        Column {
+                            Text(filterType.displayName)
+                            Text(
+                                text = filterType.description,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    },
+                    onClick = {
+                        onFilterTypeSelected(filterType)
                         expanded = false
                     }
                 )
