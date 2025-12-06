@@ -59,9 +59,6 @@ dependencies {
     // Для Parcelable
     implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:1.9.0")
 
-    // Для роботи з PDF
-    implementation("com.itextpdf:itext7-core:7.2.5")
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
